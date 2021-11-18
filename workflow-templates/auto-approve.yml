@@ -1,0 +1,28 @@
+name: Auto Approve
+on:
+  pull_request_target:
+    types: [labeled]
+
+jobs:
+  auto-approve-if-applicable:
+    if: ${{ github.event.label.name == 'auto-approve' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2.4.0
+
+      - name: Download github-actions
+        uses: actions/checkout@v2.4.0
+        with:
+          repository: locus-taxy/github-actions
+          ref: master
+          token: ${{ secrets.TOKEN }}
+          # clean token after use
+          persist-credentials: false
+          path: github-actions
+          clean: false
+
+      - name: Auto approve if user is code owner
+        id: auto-approve
+        uses: ./github-actions/auto-approve-pr
+
